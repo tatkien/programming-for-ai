@@ -1,0 +1,15 @@
+# Course materials — keep local, do not push
+assignment-vne-v3.pdf
+GUIDE.md
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.env.*
+
+# Data and notebooks checkpoints
+data/
+.ipynb_checkpoints/
