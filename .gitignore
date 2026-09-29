@@ -13,3 +13,10 @@ venv/
 # Data and notebooks checkpoints
 data/
 .ipynb_checkpoints/
+
+# Ultralytics YOLO runs and downloaded/trained weights
+runs/
+*.pt
+
+# Local scratch dumps (agent/debug cell exports)
+_*.txt
