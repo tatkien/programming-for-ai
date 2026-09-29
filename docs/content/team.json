@@ -3,22 +3,17 @@
   "repo": "https://github.com/tatkien/programming-for-ai",
   "members": [
     {
-      "name": "Nguyen Tat Kien",
+      "name": "Nguyễn Tất Kiên",
       "id": "2311735",
-      "role": "Not yet updated",
       "github": "https://github.com/tatkien"
     },
     {
-      "name": "Nguyen Thanh Minh Khoi",
-      "id": "2311687",
-      "role": "Not yet updated",
-      "github": ""
+      "name": "Nguyễn Thành Minh Khôi",
+      "id": "2311687"
     },
     {
-      "name": "Nguyen Lam Huy",
-      "id": "2311188",
-      "role": "Not yet updated",
-      "github": ""
+      "name": "Nguyễn Lâm Huy",
+      "id": "2311188"
     }
   ]
 }

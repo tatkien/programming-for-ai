@@ -1,5 +1,5 @@
 ---
-status: draft
+status: ready
 summary: EDA-first study of plant-disease localization and classification using a classical proposal pipeline and YOLO26n
 problem: Detect plant regions in field photographs and classify 27 disease and health classes
 dataset: "[Roboflow FieldPlant](https://universe.roboflow.com/plant-disease-detection/fieldplant), 5,156 images and 8,580 annotated boxes. Paper: [doi:10.1109/ACCESS.2023.3263042](https://doi.org/10.1109/ACCESS.2023.3263042)."

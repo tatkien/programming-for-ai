@@ -200,7 +200,7 @@
 
   function applyStatus(el, status) {
     const ready = statusReady(status);
-    el.textContent = ready ? "Ready to submit" : "In progress";
+    el.textContent = ready ? "Completed" : "In progress";
     el.classList.toggle("ready", ready);
     el.dataset.status = ready ? "ready" : "draft";
   }
@@ -236,10 +236,13 @@
         });
         document.querySelectorAll("[data-member-list]").forEach(function (list) {
           list.innerHTML = (team.members || []).map(function (member) {
+            const role = member.role
+              ? " — <span class=\"role\">" + escapeHtml(member.role) + "</span>"
+              : "";
             const github = safeUrl(member.github)
               ? ' — <a href="' + escapeAttr(member.github) + '" target="_blank" rel="noopener noreferrer">GitHub</a>'
               : "";
-            return "<li><strong>" + escapeHtml(member.name) + "</strong> — " + escapeHtml(member.id) + " — <span class=\"role\">" + escapeHtml(member.role || "Not yet updated") + "</span>" + github + "</li>";
+            return "<li><strong>" + escapeHtml(member.name) + "</strong> — " + escapeHtml(member.id) + role + github + "</li>";
           }).join("");
         });
       })
