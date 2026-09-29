@@ -286,7 +286,7 @@
         const fm = doc.frontMatter;
         setText('[data-field="problem"]', fm.problem || "Not yet updated");
         setText('[data-field="dataset"]', fm.dataset || "Not yet updated");
-        setHtml('[data-field="colab"]', linkOrPending(fm.colab, "Open Colab"));
+        setHtml('[data-field="colab"]', linkOrPending(fm.colab, "Open in Colab"));
         setHtml('[data-field="notebook"]', linkOrPending(fm.notebook, "Open notebook"));
         setHtml('[data-field="pdf"]', linkOrPending(fm.pdf, "Download PDF"));
         setHtml('[data-field="video"]', linkOrPending(fm.video, "Watch video"));

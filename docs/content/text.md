@@ -4,7 +4,7 @@ summary: Not yet updated
 problem: Not yet updated
 dataset: Not yet updated
 colab: "https://colab.research.google.com/drive/18UUfQYN4BJGZPBsSN3Ajv_YMuP2Us8mB?usp=sharing"
-notebook: ""
+notebook: "https://github.com/tatkien/programming-for-ai/blob/main/Text_Part_Assignment.ipynb"
 pdf: ""
 video: ""
 ---

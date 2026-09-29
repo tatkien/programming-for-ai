@@ -4,7 +4,7 @@ summary: Not yet updated
 problem: Not yet updated
 dataset: Not yet updated
 colab: "https://colab.research.google.com/drive/1rxS_ggmzLzQsWN03aDWqbb8kVlQ20vi1?usp=sharing"
-notebook: ""
+notebook: "https://github.com/tatkien/programming-for-ai/blob/main/tabular_part_assingment.ipynb"
 pdf: ""
 video: ""
 ---
