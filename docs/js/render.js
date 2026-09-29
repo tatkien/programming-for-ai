@@ -285,7 +285,7 @@
         const doc = parseDocument(text);
         const fm = doc.frontMatter;
         setText('[data-field="problem"]', fm.problem || "Not yet updated");
-        setText('[data-field="dataset"]', fm.dataset || "Not yet updated");
+        setHtml('[data-field="dataset"]', fm.dataset ? inline(fm.dataset) : "Not yet updated");
         setHtml('[data-field="colab"]', linkOrPending(fm.colab, "Open in Colab"));
         setHtml('[data-field="notebook"]', linkOrPending(fm.notebook, "Open notebook"));
         setHtml('[data-field="pdf"]', linkOrPending(fm.pdf, "Download PDF"));
