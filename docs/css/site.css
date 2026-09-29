@@ -59,6 +59,19 @@ a:focus-visible,
   gap: 1.5rem;
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.brand-logo {
+  height: 3.6rem;
+  width: auto;
+  flex: none;
+}
+
 .brand-title,
 .brand-sub,
 .kicker,
