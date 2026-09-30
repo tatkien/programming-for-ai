@@ -5,7 +5,7 @@ problem: Predict whether a patient is likely to experience a stroke based on 12 
 dataset: "[Stroke Prediction](https://www.kaggle.com/datasets/fedesoriano/stroke-prediction-dataset), 5,110 observations with 12 attributes."
 colab: "https://colab.research.google.com/drive/1rxS_ggmzLzQsWN03aDWqbb8kVlQ20vi1?usp=sharing"
 notebook: "https://github.com/tatkien/programming-for-ai/blob/main/tabular_part_assingment.ipynb"
-pdf: ""
+pdf: "@file:tabular_report.pdf"
 video: ""
 ---
 
