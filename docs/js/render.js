@@ -313,7 +313,7 @@
         setHtml('[data-field="dataset"]', fm.dataset ? inline(fm.dataset) : "Not yet updated");
         setHtml('[data-field="colab"]', linkOrPending(fm.colab, "Open in Colab"));
         setHtml('[data-field="notebook"]', linkOrPending(fm.notebook, "Open notebook"));
-        setHtml('[data-field="pdf"]', linkOrPending(fm.pdf, "Download PDF"));
+        setHtml('[data-field="pdf"]', linkOrPending(fm.pdf, "PDF report"));
         setHtml('[data-field="video"]', linkOrPending(fm.video, "Watch video"));
         const pill = document.querySelector("[data-status-pill]");
         if (pill) applyStatus(pill, fm.status);
