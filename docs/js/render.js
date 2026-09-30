@@ -43,6 +43,13 @@
     }
 
     let source = String(text);
+
+    source = source.replace(/\$\$([\s\S]+?)\$\$/g, function (full, math) {
+      return hold('<div class="math display">\\[' + escapeHtml(math.trim()) + '\\]</div>');
+    });
+    source = source.replace(/(^|[^\\])\$([^\n$]+?)\$/g, function (full, prefix, math) {
+      return prefix + hold('<span class="math inline">\\(' + escapeHtml(math.trim()) + '\\)</span>');
+    });
     source = source.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, function (full, alt, url) {
       if (!safeUrl(url)) return full;
       return hold('<img src="' + escapeAttr(url) + '" alt="' + escapeAttr(alt) + '">');
@@ -216,6 +223,21 @@
     if (el) el.textContent = value;
   }
 
+  function ensureMathJax() {
+    if (typeof window === "undefined" || window.MathJax) return;
+    if (document.querySelector('script[data-mathjax-loader="true"]')) return;
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
+    script.async = true;
+    script.setAttribute("data-mathjax-loader", "true");
+    document.head.appendChild(script);
+  }
+
+  function typesetMath(target) {
+    if (typeof window === "undefined" || !window.MathJax || typeof window.MathJax.typesetPromise !== "function") return;
+    window.MathJax.typesetPromise([target]).catch(function () {});
+  }
+
   function setHtml(selector, value) {
     const el = document.querySelector(selector);
     if (el) el.innerHTML = value;
@@ -295,7 +317,11 @@
         setHtml('[data-field="video"]', linkOrPending(fm.video, "Watch video"));
         const pill = document.querySelector("[data-status-pill]");
         if (pill) applyStatus(pill, fm.status);
-        if (writeup) writeup.innerHTML = doc.html || "<p>Not yet updated.</p>";
+        if (writeup) {
+          writeup.innerHTML = doc.html || "<p>Not yet updated.</p>";
+          ensureMathJax();
+          typesetMath(writeup);
+        }
       })
       .catch(function () {
         if (writeup) writeup.innerHTML = "<p>Could not load this section.</p>";
