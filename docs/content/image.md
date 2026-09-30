@@ -96,6 +96,16 @@ The classical pipeline evaluates three proposal mechanisms with a strict green m
 | GrabCut, green mask | 0.327 | 26.3% | 1.25 |
 | GrabCut, expanded mask | 0.327 | 26.3% | 1.25 |
 
+The expanded mask keeps the green control, then adds yellow or brown only when that color touches nearby green tissue or forms a compact region by itself. Raw yellow and raw brown are the unfiltered color responses, so they still contain soil and speckle that the guarded union rejects.
+
+![Yellow/brown disease image: green control, raw yellow and brown masks, guarded union, and green-mask watershed proposals against the ground-truth box](assets/image/expand_mask_yellow_brown.png)
+
+On this yellow/brown disease image, raw yellow and raw brown are mostly scattered specks. The guarded union stays close to the green control and does not recover the small red ground-truth box. The blue boxes are proposals from watershed with the green mask, and they cover broader leaf regions instead of that tight annotation.
+
+![Median-coverage corn leaf: the green control drops yellow streaks, and the guarded union adds streaks that touch green tissue](assets/image/expand_mask_median.png)
+
+On this median-coverage leaf, the green control drops the yellow streaks. The guarded union adds the streaks that lie against green tissue, so the mask follows more of the leaf than the green control does. The red ground-truth box still covers the whole leaf, while the blue proposals remain partial strips. Expanding the mask changes which pixels count as foreground without producing a box that matches the annotation.
+
 ![Validation examples comparing red ground-truth boxes with blue boxes from the selected classical proposal method](assets/image/proposal_methods.png)
 
 **The expanded masks do not consistently improve matching.** Field clutter, overlapping leaves, shadows, severe discoloration, and annotations that include ears or tassels can merge objects, fragment one object into several regions, or select background vegetation. Watershed with the green mask has the highest validation hit rate, but **it still localizes only 32.9% of the objects**.
