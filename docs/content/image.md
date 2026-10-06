@@ -5,7 +5,7 @@ problem: Detect plant regions in field photographs and classify 27 disease and h
 dataset: "[Roboflow FieldPlant](https://universe.roboflow.com/plant-disease-detection/fieldplant), 5,156 images and 8,580 annotated boxes. Paper: [doi:10.1109/ACCESS.2023.3263042](https://doi.org/10.1109/ACCESS.2023.3263042)."
 colab: "https://colab.research.google.com/drive/1iIgivdhGo6RJguEbPvl4Yfu96qKUg7ZO?usp=sharing"
 notebook: "https://github.com/tatkien/programming-for-ai/blob/main/image_part_assignment.ipynb"
-pdf: ""
+pdf: "https://github.com/tatkien/programming-for-ai/blob/main/docs/assets/image/main.pdf"
 video: ""
 ---
 

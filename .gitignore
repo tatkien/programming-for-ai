@@ -21,3 +21,18 @@ runs/
 
 # Local scratch dumps (agent/debug cell exports)
 _*.txt
+
+# Temporary directory
+tmp/
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.loa
+*.lof
+*.lot
+*.synctex.gz
+*.fls
+*.fdb_latexmk
