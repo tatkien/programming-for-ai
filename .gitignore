@@ -1,6 +1,7 @@
 # Course materials — keep local, do not push
 assignment-vne-v3.pdf
 GUIDE.md
+/report/
 
 # Python
 __pycache__/
