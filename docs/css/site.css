@@ -362,7 +362,7 @@ a:focus-visible,
   display: block;
   max-width: 100%;
   height: auto;
-  margin: 0.7rem 0;
+  margin: 0.7rem auto;
   border-radius: 0.75rem;
   background: rgba(255, 255, 255, 0.06);
 }
