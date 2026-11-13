@@ -65,6 +65,9 @@
     source = source.replace(/\*\*([^*]+)\*\*/g, function (full, bold) {
       return hold("<strong>" + escapeHtml(bold) + "</strong>");
     });
+    source = source.replace(/\*([^*\n]+)\*/g, function (full, italic) {
+      return hold("<em>" + escapeHtml(italic) + "</em>");
+    });
 
     return escapeHtml(source).replace(/\u0000(\d+)\u0000/g, function (_, id) {
       return tokens[Number(id)];
