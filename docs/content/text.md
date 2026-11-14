@@ -1,154 +1,74 @@
 ---
 status: ready
-summary: Vietnamese news topic classification on a VnExpress corpus using TF-IDF and three linear sklearn models; LinearSVC reaches 98.64% test accuracy.
+summary: Vietnamese news classification on 2,200 VnExpress articles. LinearSVC reaches 96.06% accuracy on 330 held-out test articles.
 problem: Classify Vietnamese news articles into four VnExpress categories (sports, business, science-technology, entertainment) with traditional NLP and machine learning.
-dataset: Public VnExpress articles stored in `raw_vnexpress_articles.csv` (`raw_content`, `category`). After length filtering: 2,199 documents; stratified 80/20 train/test (1,759 / 440).
-colab: "https://colab.research.google.com/drive/18UUfQYN4BJGZPBsSN3Ajv_YMuP2Us8mB?usp=sharing"
+dataset: Public VnExpress articles stored in `raw_vnexpress_articles.csv` (`raw_content`, `category`). The corpus contains 2,200 documents after preprocessing. Stratified train/validation/test: 1,540 / 330 / 330.
+colab: "https://colab.research.google.com/drive/12hjVvsIH7ZRtqWy4O8hRJd1EycMYoTpL?usp=sharing"
 notebook: "https://github.com/tatkien/programming-for-ai/blob/main/Text_Part_Assignment.ipynb"
 pdf: ""
 video: ""
 ---
 
-## Problem and dataset
+## Dataset and preprocessing
 
-The task is **single-label Vietnamese news classification**. Each article receives one of four VnExpress section labels: `the-thao`, `kinh-doanh`, `khoa-hoc`, `giai-tri`. The workflow is traditional NLP: clean and segment Vietnamese text, inspect lexical structure, represent documents with TF-IDF, then compare Multinomial Naive Bayes, Logistic Regression, and LinearSVC.
+The dataset consists of 2,200 article bodies collected from VnExpress, with 550 articles from each of four sections. The source section provides the classification label for each article.
 
-The modeling table is `raw_vnexpress_articles.csv` with `raw_content` (article body) and `category`. A collection cell in the notebook targets **550 articles per section** (2,200 rows in the saved CSV). Length filtering then keeps **2,199** documents. This page reports only those executed counts. Crawl date, request volume, and license-to-redistribute are **not** claimed.
+Each article body was normalized to Unicode NFC so that Vietnamese characters with diacritics have a consistent representation. The pipeline removed URLs, email addresses, and matching byline or source markers, then lowercased the text, removed punctuation and digits, and collapsed repeated whitespace. PyVi segmented the resulting text into Vietnamese words, joining multi-syllable words such as `công_nghệ` into single tokens.
 
-| Field | Role |
-| --- | --- |
-| `raw_content` | Raw article text used for cleaning and EDA statistics |
-| `category` | Section label used as the classification target |
-| `clean_content` | Segmented text after `preprocess_vietnamese_text()` |
-| `label_id` | Integer encoding of `category` via `LabelEncoder` |
+Only articles with more than 30 tokens were eligible for modeling. Identical cleaned texts within a section were reduced to one copy, and identical texts with conflicting section labels were excluded before splitting. All 2,200 articles met these checks. During feature extraction, TF-IDF excluded the Vietnamese stopwords and represented articles using individual tokens and consecutive token pairs.
 
-Four-way labels are editorial sections, not fine-grained topics. A science article about markets can still share vocabulary with business, which is the main confusion the models show later.
+## Exploratory analysis
 
-## Preprocessing
+### Article length and writing style
 
-`preprocess_vietnamese_text()` is the modeling text pipeline. Empty or non-string inputs become `''`. Remaining steps are NFC Unicode normalization; removal of URLs, emails, trailing `Ảnh` / `Theo` / `Nguồn` notes, and a leading location prefix (`Hà Nội - ...`); lowercasing; stripping punctuation and **digits**; collapsing whitespace; then **PyVi `ViTokenizer`** word segmentation.
+![Article style features by section](assets/text/eda-style-features.png)
 
-Articles with **30 tokens or fewer** are dropped (`clean_content` word count `> 30`). Labels are encoded with `LabelEncoder`. The executed filter leaves **2,199** rows.
+The word-count distributions overlap across all four sections. Business articles are concentrated at shorter lengths, while sports has a longer tail. Before lowercasing and removing digits, sports averages **33.63 number sequences** per article versus **19.95** for entertainment. Science and technology has the most uppercase tokens (**15.72** per article), while the boxplots show higher median token lengths for science and business. These differences describe writing style. The classifier uses text after digits and capitalization have been removed.
 
-EDA uses a second cleaner, `clean_for_stats()`, so digit counts and uppercase acronyms can be measured **before** those signals are deleted for classification.
+### Stopword frequency
 
-**Limitation.** Numbers and capitalization are analyzed, then discarded for TF-IDF. Sports scores, prices, and tokens such as `AI` / `USD` / `HLV` therefore cannot help the classifier.
+![Frequent Vietnamese stopwords](assets/text/stopwords.png)
 
-**Implication.** Linear n-gram models must rely on remaining Vietnamese stems and multiword expressions. That is acceptable if categories are lexically distinct; it is costly if two sections share stems and only differ in numbers or named abbreviations.
+The manual list matches **360,977 of 1,373,286 counted tokens (26.3%)**. “Và” is the most frequent match, with **26,513** occurrences. Filtering common words such as “và”, “của”, and “trong” leaves more of the model’s feature budget for topical vocabulary. The list also removes “không”, so the model may lose some information about negation.
 
-## Split
+### Frequent terms by section
 
-Classification uses a stratified **80/20** split (`test_size=0.2`, `random_state=42`) on `clean_content` with `category` labels: **1,759** train and **440** test documents. A `Pipeline` fits TF-IDF on the training fold only.
+![Frequent non-stopword terms by section](assets/text/keywords.png)
 
-There is **no validation set**. Model comparison below is therefore a single test snapshot, not a locked policy chosen on val and then tested once. The notebook previously printed train/test sizes in the preprocess cell without creating that split in the same cell, then split again before fitting. Those two operations are now the same 80/20 split reused through training.
+The counts after stopword filtering surface recognizable topics. Sports uses “bóng” (**2,666**) and “trận” (**2,636**), business uses “đồng” (**1,934**), science and technology uses “ai” (**2,627**) and “công nghệ” (**1,914**), and entertainment uses “phim” (**1,285**). General terms such as “năm” and “người” still rank highly in several sections, so frequency within a section tells only part of the story.
 
-## Exploratory data analysis
+### Common two-token phrases
 
-EDA is descriptive. Category-level TF-IDF for bigrams, and the cosine matrix, are fit on **all** 2,199 documents. They are not training-only experiments.
+![Bigrams by section](assets/text/bigrams.png)
 
-### Class counts
+Pairs of adjacent segmented tokens add context. “Man Utd” leads the sports ranking (**0.577**), while “tỷ đồng” leads business (**0.623**). “Khoa học công nghệ” and “trí tuệ nhân tạo” appear prominently in science and technology, and “người đẹp” and “cuộc thi” appear in entertainment. The notebook fits this exploratory vectorizer separately to each section’s combined text, so use the scores to rank phrases within each panel.
 
-The crawl target is balanced: **550** articles in each of the four CSV labels. After the 30-token filter, **one** document is removed (2,200 → 2,199). The test fold used in `classification_report` has **110** articles per class, so accuracy and macro-F1 are close. Overall accuracy is still reported next to macro-F1 so a majority-class reading is not required.
+### Which sections share the most vocabulary?
 
-### Style features
+![Mean pairwise cosine similarity of article TF-IDF vectors by section](assets/text/category-similarity.png)
 
-![Word-count KDE, mean digits per article, mean uppercase tokens, and average word-length boxplots by category](assets/text/eda-style-features.png)
+Each cell averages the cosine similarity between article TF-IDF vectors from the two sections. **Science and business have the highest mean cross-category similarity (0.0601).** Entertainment and sports are next (0.0493). Shared phrases such as “tỷ USD” and “triệu đồng” illustrate the overlap between science and business. The held-out confusion matrix below checks whether the model also confuses those sections. This heatmap uses the full corpus for description. Each classifier fits its own TF-IDF vectorizer using training articles.
 
-Four views use `char_count`, `word_count`, `avg_word_length` on `clean_content`, plus digit and uppercase counts on `clean_for_stats()` text.
+## Validation and test results
 
-- Word-count KDEs overlap; section is not a pure length task.
-- Mean digit tokens: sports **34.20**, business **27.80**, entertainment **21.50**, science **17.16**.
-- Mean uppercase tokens longer than one character: sports **13.01** versus entertainment **4.61**.
-- Average characters per word is slightly lower in sports than in business or science.
+The stratified 70/15/15 split uses seed 42 and contains 1,540 training, 330 validation, and 330 test articles. Validation and test have 82–83 articles per category.
 
-**Limitation.** These plots include the documents that later enter the test set. Digit and case features are **not** in the classifier.
+- **LinearSVC** achieved 0.9757 validation macro F1.
+- **Logistic regression** achieved 0.9545 validation macro F1.
+- **Multinomial Naive Bayes** achieved 0.9363 validation macro F1.
 
-**Implication.** Sports looks easiest to separate on surface form (acronyms, numbers). Science versus business is the pair to watch: fewer distinctive surface cues after numbers are stripped.
+LinearSVC was selected using validation macro F1. It classified **317 of 330** held-out articles correctly for **96.06% accuracy** and **0.9607 macro F1**.
 
-### Stopwords
+![Held-out test confusion matrix for LinearSVC](assets/text/confusion-matrices.png)
 
-![Top 20 Vietnamese stopwords and the share of stopword tokens in the corpus](assets/text/stopwords.png)
+**Science and business account for 7 of the 13 test errors.** Two examples from the saved notebook output illustrate how their vocabulary can overlap.
 
-A **manual** Vietnamese stoplist is applied (including compounds such as `cho_biết`). Over **1,276,097** tokens, stopwords are **28.7%** (**366,408** tokens, **70** distinct stop types in the text). `và` alone occurs **24,632** times.
+- **kinh-doanh → khoa-hoc** — “trong phiên trình bày khai mạc hội nghị y học từ xa châu á ats với chủ đề từ thí điểm đến hạ tầng thể chế hóa…”
+- **khoa-hoc → kinh-doanh** — “báo cáo tài chính quý iii công bố tuần này google cho biết công ty hiện có nhân viên trên toàn cầu tính đến cuối…”
 
-**Limitation.** A hand list can drop weak content words or keep function words. The list is not tuned per category.
-
-**Implication.** Removing this mass of function tokens is required before TF-IDF; the 5,000-feature cap should then be spent on topical stems.
-
-### Keywords per category
-
-![Top 15 non-stopword unigrams in each VnExpress section](assets/text/keywords.png)
-
-After stopword removal, unigram ranks follow the desks: sports (`trận`, `bóng`, `đội`), business (`tăng`, `đồng`, `doanh_nghiệp`), science (`nghiên_cứu`, `khoa_học`), entertainment (`cô`, `phim`, `diễn_viên`).
-
-**Limitation.** Counts pool every article in a class into one bag. Shared tokens (`đó`, `việt nam` in later n-grams) still overlap.
-
-**Implication.** A unigram+bigram linear model is a fair first classifier because the remaining vocabulary is already section-specific.
-
-### Bigrams
-
-![Top 15 TF-IDF bigrams per category, each class treated as one concatenated document](assets/text/bigrams.png)
-
-Per-class `TfidfVectorizer(ngram_range=(2, 2), max_features=50)` on the concatenated class text surfaces entities (`man utd`, `champions league`, `tỷ đồng`, `nhà đầu_tư`, `nhà khoa_học`).
-
-**Limitation.** This is **not** the classification TF-IDF. Concatenation ignores document frequency inside the class.
-
-**Implication.** Classification should include bigrams (`ngram_range=(1, 2)`), which it does, so entity phrases can fire at prediction time.
-
-### Cosine similarity between categories
-
-![Mean pairwise cosine similarity of TF-IDF document vectors between categories](assets/text/category-similarity.png)
-
-A global `TfidfVectorizer(max_features=5000)` is fit on all `clean_content`. For each category pair the mean of pairwise document cosines is stored. Within-class similarity is highest for sports (**0.1146**). The closest cross-class pair is science–business (**0.0405**); science–sports is **0.0274**.
-
-Mean cosine similarity of TF-IDF vectors $A$ and $B$ is
-
-$$\cos(\theta)=\frac{A\cdot B}{\|A\|\|B\|}$$
-
-**Limitation.** The vectorizer sees the full corpus, including test documents. Absolute cosine values are small because news articles are sparse; ranking of pairs matters more than the raw scale.
-
-**Implication.** Categories are lexically far apart on average. Residual errors should concentrate on science vs business, matching the confusion matrices.
-
-## Modeling
-
-All three models share one sklearn pipeline: TF-IDF features, then a classifier. The vectorizer keeps at most 5,000 unigram and bigram features and drops the manual Vietnamese stopwords. It is fitted on the training fold only.
-
-Multinomial Naive Bayes is the probabilistic baseline for this sparse feature space. Logistic Regression is a linear baseline on the same features, with at most 1,000 solver iterations and regularization C equal to 1. LinearSVC is a linear support vector machine on the same matrix, with C equal to 1 and no grid search.
-
-No PhoBERT, BERT, or other pretrained Vietnamese encoder is trained. The hyperparameters above are fixed; there is no cross-validation search.
-
-## Evaluation
-
-Metrics come from `classification_report` on **440** test articles (**110** per class): precision, recall, F1, and support, plus accuracy.
-
-| Model | Accuracy | Macro precision | Macro recall | Macro F1 |
-| --- | --- | --- | --- | --- |
-| MultinomialNB | 0.9750 | 0.9752 | 0.9750 | 0.9751 |
-| Logistic Regression | 0.9795 | 0.9799 | 0.9795 | 0.9796 |
-| LinearSVC | 0.9864 | 0.9864 | 0.9864 | 0.9864 |
-
-LinearSVC per-class F1 on the same fold: entertainment **0.9863**, science **0.9820**, business **0.9772**, sports **1.0000**.
-
-![Confusion matrices for MultinomialNB, Logistic Regression, and LinearSVC on the 440-article test set](assets/text/confusion-matrices.png)
-
-Rows are true labels; columns are predictions. For LinearSVC, sports is **110 / 110**. Off-diagonal mass is small and sits on **science–business** (and a few entertainment leaks). Naive Bayes is **1.14 percentage points** below LinearSVC in accuracy.
-
-**Limitation.** The notebook outputs do not include the raw text of each misclassified article. The confusion matrix is category-level only. A follow-up cell prints true/predicted labels and a token snippet for LinearSVC errors when the notebook is re-run.
-
-**Implication.** High accuracy is consistent with the cosine and keyword plots: three desks are easy; the remaining mistakes are the semantically closer pair the EDA already flagged.
 
 ## Limitations
 
-- **Single publisher.** All text is VnExpress style and VnExpress section names. Results do not transfer to other Vietnamese outlets without new data.
-- **Academic scrape, not a licensed dump.** Articles were taken from publicly accessible pages for this course. The notebook is not evidence of a redistribution license, so the CSV is not published in the repository.
-- **Manual stoplist.** The list may be incomplete or too aggressive.
-- **Numbers and case dropped** in `preprocess_vietnamese_text()` while EDA still uses them.
-- **TF-IDF is lexical.** Paraphrases with little n-gram overlap look dissimilar.
-- **Traditional models only.** No Transformer ablation, so this is not a SOTA Vietnamese NLP comparison.
-- **No validation split and no tuning.** `C=1.0` and default NB are frozen. The test set is the only reported holdout.
-- **Descriptive TF-IDF vs model TF-IDF.** Class-level bigrams and the cosine matrix use the full corpus; classification TF-IDF is inside the train-only pipeline.
-- **No saved article-level error table** in the current executed outputs.
+**Dataset coverage and labels.** All 2,200 articles come from VnExpress, and the corpus contains an equal number of articles from each section. The reported results therefore reflect a balanced sample from one publisher. Performance may differ on a live news feed with a different mix of topics or on another publisher’s articles. The labels come from editorial sections, so an article can cover several topics while receiving a single label. Science and business accounted for 7 of the 13 test errors, which is consistent with the vocabulary overlap observed in the exploratory analysis.
 
-## Conclusion
-
-EDA shows a **balanced four-way section task** whose remaining vocabulary, after Vietnamese segmentation and stopword removal, is already desk-specific. Mean cross-class cosine similarity stays low (**0.0405** at most for science–business). In that setting, unigram+bigram TF-IDF plus a linear classifier is the right first model: LinearSVC reaches **0.9864** accuracy and macro-F1 on 440 test articles, **1.14 points** above Naive Bayes, with perfect sports recall. The same science–business overlap that appears in EDA is the residual confusion. Limits are the VnExpress-only source, features that throw away numbers and case, a single un-tuned test split, and no inspection of individual misclassified pieces in the stored outputs.
+**Evaluation and text representation.** The results come from one stratified random split. Exact duplicate texts were checked before splitting, but separate articles about the same event can still share names, phrases, or passages across sets. The split also does not measure how well the model handles future news. TF-IDF uses individual tokens and consecutive token pairs, so it has limited ability to connect paraphrases that use different words. Removing digits, capitalization, and stopwords can also discard signals such as scores, financial amounts, acronyms, and negation.

@@ -36,3 +36,4 @@ tmp/
 *.synctex.gz
 *.fls
 *.fdb_latexmk
+*.csv
