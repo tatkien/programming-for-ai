@@ -17,6 +17,34 @@ Each article body was normalized to Unicode NFC so that Vietnamese characters wi
 
 Only articles with more than 30 tokens were eligible for modeling. Identical cleaned texts within a section were reduced to one copy, and identical texts with conflicting section labels were excluded before splitting. All 2,200 articles met these checks. During feature extraction, TF-IDF excluded the Vietnamese stopwords and represented articles using individual tokens and consecutive token pairs.
 
+## Preprocessing examples
+
+One article from each VnExpress section shows how preprocessing changes the text. Each excerpt shows up to 50 whitespace-separated units from the original or 50 tokens after cleaning and PyVi segmentation. Underscores join syllables that PyVi treats as one word.
+
+### Entertainment (`giai-tri`)
+
+**Before preprocessing** · Ngày 26/10, Harper's Bazaar có bài phỏng vấn Natalie Portman dịp diễn viên sắp trở lại màn ảnh với The Gallerist (dự kiến ra mắt hôm 4/12). Ngoài thảo luận về phim mới, cô nói về cuộc sống khi có con thứ ba. Em bé là con của Portman và
+
+**After preprocessing** · ngày harper s bazaar có bài phỏng_vấn natalie portman dịp diễn_viên sắp trở_lại màn_ảnh với the gallerist dự_kiến ra_mắt hôm ngoài thảo_luận về phim mới cô nói về cuộc_sống khi có con thứ ba em bé là con của portman và nhạc_sĩ người pháp tanguy destable con đầu_lòng của anh
+
+### Science and technology (`khoa-hoc`)
+
+**Before preprocessing** · Theo NBC News , từ tháng 6 đến nay, kẻ trộm đã lấy đi lượng hàng hóa trị giá hơn 100 triệu USD, vốn đang được vận chuyển đến các trung tâm dữ liệu Mỹ. Con số này được ước tính dựa trên thông tin từ lãnh đạo doanh nghiệp,
+
+**After preprocessing** · theo nbc news từ tháng đến nay kẻ_trộm đã lấy đi lượng hàng_hóa trị_giá hơn triệu usd vốn đang được vận_chuyển đến các trung_tâm dữ_liệu mỹ con_số này được ước_tính dựa trên thông_tin từ lãnh_đạo doanh_nghiệp cố_vấn và điều_tra_viên hỗ_trợ cơ_quan cảnh_sát điều_tra những vụ trộm lớn nhất hàng_hóa bị
+
+### Business (`kinh-doanh`)
+
+**Before preprocessing** · Sau phiên giảm sâu đầu tuần, nhiều nhóm phân tích khuyến nghị nhà đầu tư hạ tỷ trọng cổ phiếu, bởi thị trường đang thiếu lực cầu nâng đỡ và có khả năng thủng thêm các ngưỡng hỗ trợ quan trọng. Thực tế hôm nay VN-Index giao dịch dưới tham
+
+**After preprocessing** · sau phiên_giảm sâu đầu tuần nhiều nhóm phân_tích khuyến_nghị nhà đầu_tư hạ tỷ_trọng cổ_phiếu bởi thị_trường đang thiếu lực cầu nâng_đỡ và có khả_năng thủng thêm các ngưỡng hỗ_trợ quan_trọng thực_tế hôm_nay vn index giao_dịch dưới tham_chiếu trong phần_lớn thời_gian và nới rộng biên_độ giảm ở những phút cuối chỉ_số
+
+### Sports (`the-thao`)
+
+**Before preprocessing** · Sự việc xảy ra tại sân Parque do Sabia, thành phố Uberlandia, bang Minas Gerais, Brazil, hôm 1/11. Trận lượt đi bán kết giải hạng Nhì bang Minas Gerais dành cho lứa U20 kết thúc với chiến thắng 3-1 cho Mamore, nhưng bàn thắng thứ ba của đội khách châm
+
+**After preprocessing** · sự_việc xảy ra tại sân parque do sabia thành_phố uberlandia bang minas gerais brazil hôm trận lượt đi bán_kết giải hạng nhì bang minas gerais dành cho lứa u kết_thúc với chiến_thắng cho mamore nhưng bàn thắng thứ ba của đội khách châm ngòi cho hỗn_chiến theo biên_bản của trọng_tài
+
 ## Exploratory analysis
 
 ### Article length and writing style
