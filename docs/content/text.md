@@ -5,9 +5,15 @@ problem: Classify Vietnamese news articles into four VnExpress categories (sport
 dataset: Public VnExpress articles stored in `raw_vnexpress_articles.csv` (`raw_content`, `category`). The corpus contains 2,200 documents after preprocessing. Stratified train/validation/test: 1,540 / 330 / 330.
 colab: "https://colab.research.google.com/drive/12hjVvsIH7ZRtqWy4O8hRJd1EycMYoTpL?usp=sharing"
 notebook: "https://github.com/tatkien/programming-for-ai/blob/main/Text_Part_Assignment.ipynb"
-pdf: ""
+pdf: "https://github.com/tatkien/programming-for-ai/blob/main/docs/assets/text/Text_part_report.pdf"
 video: ""
 ---
+
+## Classification workflow
+
+The notebook starts with a CSV snapshot of VnExpress articles and falls back to collecting article bodies from the website when no snapshot is available. It normalizes the text, segments Vietnamese words with PyVi, and checks the cleaned articles for minimum length and duplicate text. The full cleaned corpus is used to explore article lengths, frequent terms, bigrams, and vocabulary overlap across the four news categories.
+
+For classification, the notebook divides the articles into stratified training, validation, and test sets. Multinomial Naive Bayes, logistic regression, and LinearSVC each use the same TF-IDF settings for unigrams and bigrams. Each pipeline learns its vocabulary and term weights from the training articles. Validation macro F1 determines which model proceeds to the held-out test set, where accuracy, per-category scores, and the confusion matrix show how it performs.
 
 ## Dataset and preprocessing
 
@@ -46,6 +52,12 @@ One article from each VnExpress section shows how preprocessing changes the text
 **After preprocessing** · sự_việc xảy ra tại sân parque do sabia thành_phố uberlandia bang minas gerais brazil hôm trận lượt đi bán_kết giải hạng nhì bang minas gerais dành cho lứa u kết_thúc với chiến_thắng cho mamore nhưng bàn thắng thứ ba của đội khách châm ngòi cho hỗn_chiến theo biên_bản của trọng_tài
 
 ## Exploratory analysis
+
+### Articles per category
+
+![Bar chart showing 550 articles in each of the four categories after preprocessing](assets/text/class-distribution.png)
+
+The four categories each contain **550 articles** after preprocessing, for a total of **2,200 articles**.
 
 ### Article length and writing style
 
